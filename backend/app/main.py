@@ -1,11 +1,12 @@
 from os import access
 from services.bot_detection import get_bot_detection_service
 from services.instagram import get_instagram_service
+from services.redis import get_redis
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from internal.settings import Settings, get_settings
-from internal.models import ScoreUserRes, ScoreUsersReq
+from internal.models import ScoreUserRes, ScoreUsersReq, UserScore
 
 app = FastAPI()
 
@@ -23,28 +24,51 @@ async def root():
     return {"message": "OK"}
 
 
-# @app.get("/info")
-# async def info(settings: Settings = Depends(get_settings)):
-#     return {
-#         "app_name": settings.app_name,
-#         "instagram_username": settings.instagram_account_username,
-#         "instagram_password": settings.instagram_account_password,
-#     }
-
-
 @app.post("/score")
 async def asses_users(users: ScoreUsersReq):
-    print(users)
-    return {"div": "div"}
+    settings = get_settings()
+    storage = get_redis(
+        settings.redis_endpoint,
+        settings.redis_password,
+        settings.redis_port
+    )
 
-
-@app.get("/{username}/score")
-async def user_score(username: str):
-    # insta = get_instagram_service()
     bot = get_bot_detection_service()
+    scores = {}
+    for username in users.users:
+        try:
+            if not storage.has_user_data(username):
+                insta = get_instagram_service()
+                # Fetch instagram data
+                data = insta.get_data_by_username(username)
+                data = bot.format_instagram_response(data)
+                storage.store_user(username, data=data)
+            else:
+                data = storage.get_user_data(username)
+            score = bot.score_users([data])
+            # score = [[0, 0]]
+            print(data)
+            scores[username] = (UserScore(
+                username=username,
+                score_is_fake=score[0][1],
+                score_is_not_fake=score[0][0],
+                score_is_bot=0,
+                score_is_not_bot=0,
+            ))
+        except Exception as e:
+            print(e)
+            scores[username] = {"error": "error"}
 
-    # print(service.get_data_by_username(username))
-    return {"item_id": username, "is_fake": bot.asses_is_fake()}
+    return scores
+
+
+# @app.get("/{username}/score")
+# async def user_score(username: str):
+#     # insta = get_instagram_service()
+#     bot = get_bot_detection_service()
+
+#     # print(service.get_data_by_username(username))
+#     return {"item_id": username, "is_fake": bot.score_user()}
 
 
 @app.get("/{username}/info")

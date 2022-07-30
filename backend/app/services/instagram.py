@@ -24,7 +24,7 @@ class InstagramService:
         # user = self.client.user_info(user_id)
         logger.debug(f"Fetching user info for: {username}")
         user = self.client.user_info_by_username(username)
-        return user
+        return user.dict()
 
 
 @lru_cache()

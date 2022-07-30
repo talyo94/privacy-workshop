@@ -1,7 +1,7 @@
 from pydantic import BaseModel, conlist
 
 
-class User(BaseModel):
+class UserScore(BaseModel):
     username: str
     score_is_fake: float
     score_is_not_fake: float
@@ -14,4 +14,4 @@ class ScoreUsersReq(BaseModel):
 
 
 class ScoreUserRes(BaseModel):
-    users: conlist(min_items=1, item_type=User)
+    users: conlist(min_items=1, item_type=UserScore)
