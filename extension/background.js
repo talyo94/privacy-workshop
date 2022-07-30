@@ -32,8 +32,6 @@ chrome.action.onClicked.addListener((tab) => {
   chrome.scripting.executeScript({
     files: ["myscript.js"],
     target: { tabId: tab.id },
-    // function: () => console.log("Muth"),
   });
   chrome.scripting.executeScript(null, { file: "myscript.js" });
-  // document.body.style.backgroundColor = "red";
 });

@@ -77,7 +77,7 @@ async def user_info(username: str):
     user = service.get_data_by_username(username)
 
     if not user:
-        return {"message": "fuck"}
+        return {"message": "invalid user name"}
     account_data = user.dict()
     return {"user_media_count": account_data["media_count"],
             "user_follower_count": account_data["follower_count"],
