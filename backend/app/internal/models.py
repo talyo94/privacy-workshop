@@ -10,7 +10,7 @@ class UserScore(BaseModel):
 
 
 class ScoreUsersReq(BaseModel):
-    users: conlist(min_items=1, max_items=10, item_type=str)
+    users: conlist(min_items=1, max_items=30, item_type=str)
 
 
 class ScoreUserRes(BaseModel):
