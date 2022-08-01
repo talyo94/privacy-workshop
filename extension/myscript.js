@@ -38,27 +38,53 @@ function createBotLabel(fakePercentage) {
 
 function findUsers() {
   const BOT_LABEL_CLS = "bot-label";
-  const r = /^\/\w+\/$/;
+  // const r = /^\/\w+\/$/;
+  const r = /^\/[a-zA-Z0-9\._]+\/$/;
 
-  document.querySelectorAll(`.${BOT_LABEL_CLS}`).forEach((node) => {
-    node.remove();
+  const userNodes = {};
+
+  document.querySelectorAll('a[href^="/"').forEach((node) => {
+    const href = node.getAttribute("href");
+    if (href.startsWith("/explore")) {
+      return;
+    }
+    const isUser = r.test(href);
+    if (isUser) {
+      const username = href.replaceAll("/", ""); // get the username
+      if (!userNodes[username]) {
+        userNodes[username] = [];
+      }
+      userNodes[username].push(node); // add node to reference
+    }
   });
+  if (Object.keys(userNodes).length > 0)
+    fetch("http://localhost:8000/score", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
 
-  document
-    .querySelectorAll('a[href^="/"')
-
-    .forEach((node) => {
-      const href = node.getAttribute("href");
-      if (href.startsWith("/explore")) {
-        return;
-      }
-      const isUser = r.test(href);
-      if (isUser) {
-        // node.style["color"] = "#f8f8f8";
-        const lbl = createBotLabel(Math.random());
-        node.append(lbl);
-      }
-    });
+      body: JSON.stringify({ users: Object.keys(userNodes) }), // send usernames
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        document.querySelectorAll(`.${BOT_LABEL_CLS}`).forEach((node) => {
+          node.remove();
+        });
+        Object.keys(data).forEach((username) => {
+          const fakeScore = data[username].score_is_fake;
+          if (userNodes[username]) {
+            userNodes[username].forEach((node) => {
+              const lbl = createBotLabel(fakeScore);
+              node.append(lbl); // put bot labels next to nodes
+            });
+          }
+        });
+      });
 }
 
 findUsers();
+
+setInterval(() => {
+  findUsers();
+}, 5000);
