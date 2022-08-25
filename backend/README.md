@@ -7,6 +7,13 @@ First install all dependencies:
 pip install -r requirements.txt
 ```
 
+
+Setup env variables:
+
+Copy the `.env.example` file to `internal/.env` and fill the values.
+Those are required values to authenticate with Instgram and store data on backend (redis).
+
+
 To start webserver:
 
 ```bash
