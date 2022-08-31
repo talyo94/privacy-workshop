@@ -38,10 +38,11 @@ async def asses_users(users: ScoreUsersReq):
 
     bot = get_bot_detection_service()
     scores = {}
+
     for username in users.users:
         try:
             if not storage.has_user_data(username):
-                continue
+                # continue
                 insta = get_instagram_service()
                 # Fetch instagram data
                 data = insta.get_data_by_username(username)
@@ -50,14 +51,10 @@ async def asses_users(users: ScoreUsersReq):
             else:
                 data = storage.get_user_data(username)
             score = bot.score_users([data])
-            # score = [[0, 0]]
-            print(data)
             scores[username] = UserScore(
                 username=username,
                 score_is_fake=score[0][1],
                 score_is_not_fake=score[0][0],
-                score_is_bot=0,
-                score_is_not_bot=0,
             )
         except Exception as e:
             print(e)

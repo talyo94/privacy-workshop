@@ -3,8 +3,8 @@
 > Spring Semester, 2022
 > TAU
 
+> Group #3
 > Eden Blumenstyk, Liron Geldbard, Roy Talyosef
-
 
 
 This work is part of the workshop on Usable Security and Privacy held by Dr. Mahmood Sharif.
@@ -17,6 +17,8 @@ The project is split between:
 1. **ML Model** - data testing and maniputlation (mainly Jupyter Notebooks) for training and evaluating different ML classifiers `/data dir`
 
 # Running the project
+
+Short example: https://youtu.be/QmPWELv5cHs
 
 ## Backend
 
